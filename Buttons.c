@@ -68,35 +68,35 @@ void kbd_drv()
 			key_state = 0;
 			buttonstatus=4;// кнопка отпущена
 		}break;
-// 		case 3:
-// 		if (key_code == _key_code)
-// 		{
-// 			if(btn_pause_state == 2)
-// 			{
-// 				counter_lable =3;
-// 				SetTimerTask(button_pause_time_counter,REPEAT_DELAY);
-// 				buttonstatus = 2;// кнопка удерживается
-// 				key_state =4;
-// 			}
-// 			else
-// 			{
-// 				key_state = 0;
-// 			}
-// 		}break;
-// 		case 4:
-// 		if(key_code == _key_code)
-// 		{
-// 			if(btn_pause_state == 3)
-// 			{
-// 				buttonstatus = 3;// автоповтор
-// 				counter_lable=4;
-// 				SetTimerTask(button_pause_time_counter,REPEAT_DELAY);
-// 			}
-// 			else key_state = 0;
-// 		}
-// 		
-// 		
-// 		break;
+ 		case 3:
+ 		if (key_code == _key_code)
+ 		{
+ 			if(btn_pause_state == 2)
+ 			{
+ 				counter_lable =3;
+ 				SetTimerTask(button_pause_time_counter,REPEAT_DELAY);
+ 				buttonstatus = 2;// кнопка удерживается
+ 				key_state =4;
+ 			}
+ 			else
+ 			{
+ 				key_state = 0;
+ 			}
+ 		}break;
+ 		case 4:
+ 		if(key_code == _key_code)
+ 		{
+ 			if(btn_pause_state == 3)
+ 			{
+ 				buttonstatus = 3;// автоповтор
+ 				counter_lable=4;
+ 				SetTimerTask(button_pause_time_counter,REPEAT_DELAY);
+ 			}
+ 			else key_state = 0;
+ 		}
+ 		
+ 		
+ 		break;
 	}
 	
 }
