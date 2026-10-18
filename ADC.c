@@ -34,7 +34,7 @@ char high_adc=0,low_adc=0;
 // 	22515, 22075, 21642, 21216, 20796, 20386, 19983, 19586,
 // 	19196, 18813, 18435, 18064, 17699, 17341, 16989
 // };
-//0-155 řŕă 1ăđŕäóń
+//0-155 шаг 1градус
 const temperature_table_entry_type termo_table[] PROGMEM = {
 	62603, 62459, 62310, 62155, 61995, 61828, 61655, 61475,
 	61289, 61096, 60897, 60690, 60477, 60256, 60028, 59793,
@@ -57,14 +57,14 @@ const temperature_table_entry_type termo_table[] PROGMEM = {
 	8317, 8144, 7974, 7808, 7646, 7487, 7332, 7180,
 	7031, 6886, 6744, 6605
 };
-// Ôóíęöč˙ âű÷čńë˙ĺň çíŕ÷ĺíčĺ ňĺěďĺđŕňóđű â äĺń˙ňűő äîë˙ő ăđŕäóńîâ Öĺëüńč˙
-// â çŕâčńčěîńňč îň ńóěěŕđíîăî çíŕ÷ĺíč˙ ŔÖĎ.
+// Функция вычисляет значение температуры в десятых долях градусов Цельсия
+// в зависимости от суммарного значения АЦП.
 int16_t calc_temperature(temperature_table_entry_type adcsum) {
 	temperature_table_index_type left = 0;//
 	temperature_table_index_type right = (sizeof(termo_table) / sizeof(termo_table[0])) - 1;//
 	temperature_table_entry_type thigh = TEMPERATURE_TABLE_READ(right);//
 	
-	// Ďđîâĺđęŕ âűőîäŕ çŕ ďđĺäĺëű č ăđŕíč÷íűő çíŕ÷ĺíčé
+	// Проверка выхода за пределы и граничных значений
 	if (adcsum <= thigh) {
 		#ifdef TEMPERATURE_UNDER
 		if (adcsum < thigh)
@@ -81,7 +81,7 @@ int16_t calc_temperature(temperature_table_entry_type adcsum) {
 		return TEMPERATURE_TABLE_START;
 	}
 
-	// Äâîč÷íűé ďîčńę ďî ňŕáëčöĺ
+	// Двоичный поиск по таблице
 	while ((right - left) > 1) {
 		temperature_table_index_type m = (left + right)/2 /*>> 1*/;// âű÷čńëĺíčĺ ńđĺäíĺé ňî÷ęč
 		temperature_table_entry_type mid = TEMPERATURE_TABLE_READ(m);
@@ -99,7 +99,7 @@ int16_t calc_temperature(temperature_table_entry_type adcsum) {
 	temperature_table_entry_type vd = vl - vr;
 	int16_t res = TEMPERATURE_TABLE_START + right * TEMPERATURE_TABLE_STEP;
 	if (vd) {
-		// Ëčíĺéíŕ˙ číňĺđďîë˙öč˙
+		// Линейная интерполяция
 		res -= ((TEMPERATURE_TABLE_STEP * (int32_t)(adcsum - vr) + (vd >> 1)) / vd);
 		//res -= corr;
 	}
@@ -119,8 +119,8 @@ ISR(ADC_vect)
 }
 void ADC_init()
 {	 
-	 ADMUX = 0x40;// Íŕńňđîčě îďîđíîĺ íŕďđ˙ćĺíčĺ íŕ VCC  ADC0
-	 // Âęëţ÷čě ŔÖĎ č óńňŕíîâčě ęîýôôčöčĺíň äĺëĺíč˙ íŕ 128
+	 ADMUX = 0x40;// Настроим опорное напряжение на VCC  ADC0
+	 // Включим АЦП и установим коэффициент деления на 128
 	 ADCSRA =_BV(ADEN)/*|_BV(ADSC)*/|_BV(ADIE)|_BV(ADPS2)|_BV(ADPS1)|_BV(ADPS0);
 }
 
@@ -129,7 +129,7 @@ void Read_temp_one()
 	temperature_table_entry_type summ1 = 0;
 	for (uint8_t i = 0; i < 64; i++)
 	{		
-		StartConvAdc();// Íŕ÷íĺě ďđĺîáđŕçîâŕíčĺ
+		StartConvAdc();// Начнем преобразование
 		do {summ1 += ADC;}
 		while (!(ADCSRA & _BV(ADSC)));
 	}
@@ -140,7 +140,7 @@ void Read_temp_two()
 {
 	temperature_table_entry_type summ2 = 0;
 	for (uint8_t i = 0; i < 64; i++) {
-		StartConvAdc();// Íŕ÷íĺě ďđĺîáđŕçîâŕíčĺ
+		StartConvAdc();// Начнем преобразование
 		do {summ2 += ADC;}
 		while (!(ADCSRA & _BV(ADSC)));
 	}
@@ -151,7 +151,7 @@ void Read_temp_three()
 {
 	temperature_table_entry_type summ3 = 0;
 	for (uint8_t i = 0; i < 64; i++) {
-		StartConvAdc();// Íŕ÷íĺě ďđĺîáđŕçîâŕíčĺ;
+		StartConvAdc();// Начнем преобразование
 		do {summ3 += ADC;}
 		while (!(ADCSRA & _BV(ADSC)));
 	}
@@ -169,12 +169,12 @@ void Read_pressure()
 
 	adc_res = ads1115_readADC_SingleEnded(ADS1115_ADDR_GND,0,ADS1115_DR_8SPS,ADS1115_PGA_4_096);
 	//adc_res = Read_MCP3208(7);
-	adc_value = adc_res	>> 8;//÷čňŕĺě ňîëüęî ńňŕđřčé áŕéň
+	adc_value = adc_res	>> 8;//читаем только старший байт
 	ptemp = adc_value ;
 
  	switch(adc_value)
  	{
-// 		case 4: ptemp = 0; break;//ŕňěîńôĺđíîĺ äŕâëĺíčĺ
+// 		case 4: ptemp = 0; break;//атмосферное давление
 // 		case 6: ptemp = 1;break;
 // 		case 8: ptemp = 2;break;
 // 		case 10:ptemp = 3;break;
@@ -233,7 +233,7 @@ void Read_temp()
 
 void Water_Off()
 {
-	PORTD &=~_BV(WaterPin);water=0;//âűęëţ÷ĺíčĺ âîäŕ
+	PORTD &=~_BV(WaterPin);water=0;//выключение вода
 }
 void Read_signal_codes()// ×ňĺíčĺ ęîäîâ ŕâŕđčé
 {		
