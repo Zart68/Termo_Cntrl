@@ -236,12 +236,22 @@ int main(void)
 //	Read_signal_codes(); //÷òåíèå êîäà àâàðèè
 		
 	Read_keys();//
+
+	Read_on_off_btn();
 	
 	uart_send_msg();//
 	
 	Main_task();//
 			
 //	Change_mode();
+	setpos(0,0);
+ 	str_lcd("Temp cub");
+	setpos(0,1);
+ 	str_lcd("Temp def");
+	setpos(0,2);
+	str_lcd("Temp tsa");
+	setpos(0,3);
+	str_lcd("Temp 4");	
 	
 	sei();
 	
