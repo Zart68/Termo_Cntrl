@@ -10,13 +10,13 @@
 char high_adc=0,low_adc=0;
 
 
-/* Таблица суммарного значения АЦП в зависимости от температуры. От большего значения к меньшему
-   Для построения таблицы использованы следующие парамертры:
-     R1(T1): 100кОм(25°С)
-     Таблица R/T характеристик: EPCOS R/T:4901; B25/100:3950K
-     Схема включения: A
-     Ra: 15кОм
-     Напряжения U0/Uref: 5В/5В
+/* РўР°Р±Р»РёС†Р° СЃСѓРјРјР°СЂРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РђР¦Рџ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РµРјРїРµСЂР°С‚СѓСЂС‹. РћС‚ Р±РѕР»СЊС€РµРіРѕ Р·РЅР°С‡РµРЅРёСЏ Рє РјРµРЅСЊС€РµРјСѓ
+   Р”Р»СЏ РїРѕСЃС‚СЂРѕРµРЅРёСЏ С‚Р°Р±Р»РёС†С‹ РёСЃРїРѕР»СЊР·РѕРІР°РЅС‹ СЃР»РµРґСѓСЋС‰РёРµ РїР°СЂР°РјРµСЂС‚СЂС‹:
+     R1(T1): 100РєРћРј(25В°РЎ)
+     РўР°Р±Р»РёС†Р° R/T С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє: EPCOS R/T:4901; B25/100:3950K
+     РЎС…РµРјР° РІРєР»СЋС‡РµРЅРёСЏ: A
+     Ra: 15РєРћРј
+     РќР°РїСЂСЏР¶РµРЅРёСЏ U0/Uref: 5Р’/5Р’
 */
 // const temperature_table_entry_type termo_table[] PROGMEM = {
 // 	62603, 62459, 62310, 62155, 61995, 61828, 61655, 61475,
@@ -34,7 +34,7 @@ char high_adc=0,low_adc=0;
 // 	22515, 22075, 21642, 21216, 20796, 20386, 19983, 19586,
 // 	19196, 18813, 18435, 18064, 17699, 17341, 16989
 // };
-//0-155 шаг 1градус
+//0-155 Е™Е•Дѓ 1ДѓД‘Е•Г¤ГіЕ„
 const temperature_table_entry_type termo_table[] PROGMEM = {
 	62603, 62459, 62310, 62155, 61995, 61828, 61655, 61475,
 	61289, 61096, 60897, 60690, 60477, 60256, 60028, 59793,
@@ -57,14 +57,14 @@ const temperature_table_entry_type termo_table[] PROGMEM = {
 	8317, 8144, 7974, 7808, 7646, 7487, 7332, 7180,
 	7031, 6886, 6744, 6605
 };
-// Функция вычисляет значение температуры в десятых долях градусов Цельсия
-// в зависимости от суммарного значения АЦП.
+// Г”ГіГ­Д™Г¶ДЌЛ™ ГўЕ±Г·ДЌЕ„Г«Л™ДєЕ€ Г§Г­Е•Г·ДєГ­ДЌДє Е€ДєД›ДЏДєД‘Е•Е€ГіД‘Е± Гў Г¤ДєЕ„Л™Е€Е±Е‘ Г¤Г®Г«Л™Е‘ ДѓД‘Е•Г¤ГіЕ„Г®Гў Г–ДєГ«ГјЕ„ДЌЛ™
+// Гў Г§Е•ГўДЌЕ„ДЌД›Г®Е„Е€ДЌ Г®Е€ Е„ГіД›Д›Е•Д‘Г­Г®ДѓГ® Г§Г­Е•Г·ДєГ­ДЌЛ™ Е”Г–ДЋ.
 int16_t calc_temperature(temperature_table_entry_type adcsum) {
 	temperature_table_index_type left = 0;//
 	temperature_table_index_type right = (sizeof(termo_table) / sizeof(termo_table[0])) - 1;//
 	temperature_table_entry_type thigh = TEMPERATURE_TABLE_READ(right);//
 	
-	// Проверка выхода за пределы и граничных значений
+	// ДЋД‘Г®ГўДєД‘Д™Е• ГўЕ±Е‘Г®Г¤Е• Г§Е• ДЏД‘ДєГ¤ДєГ«Е± ДЌ ДѓД‘Е•Г­ДЌГ·Г­Е±Е‘ Г§Г­Е•Г·ДєГ­ДЌГ©
 	if (adcsum <= thigh) {
 		#ifdef TEMPERATURE_UNDER
 		if (adcsum < thigh)
@@ -81,13 +81,13 @@ int16_t calc_temperature(temperature_table_entry_type adcsum) {
 		return TEMPERATURE_TABLE_START;
 	}
 
-	// Двоичный поиск по таблице
+	// Г„ГўГ®ДЌГ·Г­Е±Г© ДЏГ®ДЌЕ„Д™ ДЏГ® Е€Е•ГЎГ«ДЌГ¶Дє
 	while ((right - left) > 1) {
-		temperature_table_index_type m = (left + right)/2 /*>> 1*/;// вычисление средней точки
+		temperature_table_index_type m = (left + right)/2 /*>> 1*/;// ГўЕ±Г·ДЌЕ„Г«ДєГ­ДЌДє Е„Д‘ДєГ¤Г­ДєГ© Е€Г®Г·Д™ДЌ
 		temperature_table_entry_type mid = TEMPERATURE_TABLE_READ(m);
-		if (adcsum > mid) {// Если ключ больше arr[mid], игнорируем левую половину
+		if (adcsum > mid) {// Д№Е„Г«ДЌ Д™Г«ЕЈГ· ГЎГ®Г«ГјЕ™Дє arr[mid], ДЌДѓГ­Г®Д‘ДЌД‘ГіДєД› Г«ДєГўГіЕЈ ДЏГ®Г«Г®ГўДЌГ­Гі
 			right = m;
-			} else {// Если ключ меньше или равен arr[mid],игнорируем правую половину
+			} else {// Д№Е„Г«ДЌ Д™Г«ЕЈГ· Д›ДєГ­ГјЕ™Дє ДЌГ«ДЌ Д‘Е•ГўДєГ­ arr[mid],ДЌДѓГ­Г®Д‘ДЌД‘ГіДєД› ДЏД‘Е•ГўГіЕЈ ДЏГ®Г«Г®ГўДЌГ­Гі
 			left = m;
 		}
 	}
@@ -99,7 +99,7 @@ int16_t calc_temperature(temperature_table_entry_type adcsum) {
 	temperature_table_entry_type vd = vl - vr;
 	int16_t res = TEMPERATURE_TABLE_START + right * TEMPERATURE_TABLE_STEP;
 	if (vd) {
-		// Линейная интерполяция
+		// Г‹ДЌГ­ДєГ©Г­Е•Л™ ДЌГ­Е€ДєД‘ДЏГ®Г«Л™Г¶ДЌЛ™
 		res -= ((TEMPERATURE_TABLE_STEP * (int32_t)(adcsum - vr) + (vd >> 1)) / vd);
 		//res -= corr;
 	}
@@ -119,8 +119,8 @@ ISR(ADC_vect)
 }
 void ADC_init()
 {	 
-	 ADMUX = 0x40;// Настроим опорное напряжение на VCC  ADC0
-	 // Включим АЦП и установим коэффициент деления на 128
+	 ADMUX = 0x40;// ГЌЕ•Е„Е€Д‘Г®ДЌД› Г®ДЏГ®Д‘Г­Г®Дє Г­Е•ДЏД‘Л™Д‡ДєГ­ДЌДє Г­Е• VCC  ADC0
+	 // Г‚Д™Г«ЕЈГ·ДЌД› Е”Г–ДЋ ДЌ ГіЕ„Е€Е•Г­Г®ГўДЌД› Д™Г®ГЅГґГґДЌГ¶ДЌДєГ­Е€ Г¤ДєГ«ДєГ­ДЌЛ™ Г­Е• 128
 	 ADCSRA =_BV(ADEN)/*|_BV(ADSC)*/|_BV(ADIE)|_BV(ADPS2)|_BV(ADPS1)|_BV(ADPS0);
 }
 
@@ -129,7 +129,7 @@ void Read_temp_one()
 	temperature_table_entry_type summ1 = 0;
 	for (uint8_t i = 0; i < 64; i++)
 	{		
-		StartConvAdc();// Начнем преобразование
+		StartConvAdc();// ГЌЕ•Г·Г­ДєД› ДЏД‘ДєГ®ГЎД‘Е•Г§Г®ГўЕ•Г­ДЌДє
 		do {summ1 += ADC;}
 		while (!(ADCSRA & _BV(ADSC)));
 	}
@@ -140,7 +140,7 @@ void Read_temp_two()
 {
 	temperature_table_entry_type summ2 = 0;
 	for (uint8_t i = 0; i < 64; i++) {
-		StartConvAdc();// Начнем преобразование
+		StartConvAdc();// ГЌЕ•Г·Г­ДєД› ДЏД‘ДєГ®ГЎД‘Е•Г§Г®ГўЕ•Г­ДЌДє
 		do {summ2 += ADC;}
 		while (!(ADCSRA & _BV(ADSC)));
 	}
@@ -151,7 +151,7 @@ void Read_temp_three()
 {
 	temperature_table_entry_type summ3 = 0;
 	for (uint8_t i = 0; i < 64; i++) {
-		StartConvAdc();// Начнем преобразование;
+		StartConvAdc();// ГЌЕ•Г·Г­ДєД› ДЏД‘ДєГ®ГЎД‘Е•Г§Г®ГўЕ•Г­ДЌДє;
 		do {summ3 += ADC;}
 		while (!(ADCSRA & _BV(ADSC)));
 	}
@@ -169,12 +169,12 @@ void Read_pressure()
 
 	adc_res = ads1115_readADC_SingleEnded(ADS1115_ADDR_GND,0,ADS1115_DR_8SPS,ADS1115_PGA_4_096);
 	//adc_res = Read_MCP3208(7);
-	adc_value = adc_res	>> 8;//читаем только старший байт
+	adc_value = adc_res	>> 8;//Г·ДЌЕ€Е•ДєД› Е€Г®Г«ГјД™Г® Е„Е€Е•Д‘Е™ДЌГ© ГЎЕ•Г©Е€
 	ptemp = adc_value ;
 
  	switch(adc_value)
  	{
-// 		case 4: ptemp = 0; break;//атмосферное давление
+// 		case 4: ptemp = 0; break;//Е•Е€Д›Г®Е„ГґДєД‘Г­Г®Дє Г¤Е•ГўГ«ДєГ­ДЌДє
 // 		case 6: ptemp = 1;break;
 // 		case 8: ptemp = 2;break;
 // 		case 10:ptemp = 3;break;
@@ -233,29 +233,29 @@ void Read_temp()
 
 void Water_Off()
 {
-	PORTD &=~_BV(WaterPin);water=0;//выключение вода
+	PORTD &=~_BV(WaterPin);water=0;//ГўЕ±Д™Г«ЕЈГ·ДєГ­ДЌДє ГўГ®Г¤Е•
 }
-void Read_signal_codes()// Чтение кодов аварий
+void Read_signal_codes()// Г—Е€ДєГ­ДЌДє Д™Г®Г¤Г®Гў Е•ГўЕ•Д‘ДЌГ©
 {		
-	if(!(PINB & _BV(ErrorPin))) //высокий уровень в ёмкости
+	if(!(PINB & _BV(ErrorPin))) //ГўЕ±Е„Г®Д™ДЌГ© ГіД‘Г®ГўДєГ­Гј Гў ВёД›Д™Г®Е„Е€ДЌ
 	{
 		signal_flag = 1;
 		PORTB |=_BV(ZummerPin);
 	}
 	else 	
 	{
-		signal_flag = 0;//отмена
+		signal_flag = 0;//Г®Е€Д›ДєГ­Е•
 		//PORTB &=~ _BV(ZummerPin);
 	}
-    if(!(PIND & _BV(LevelPin))) //низкий уровень в 1 контуре
+    if(!(PIND & _BV(LevelPin))) //Г­ДЌГ§Д™ДЌГ© ГіД‘Г®ГўДєГ­Гј Гў 1 Д™Г®Г­Е€ГіД‘Дє
 	{   
 		signal_flag = 2;
-		_power_level =147;// 0% стартовое значение уровня мощности(147)
-		SetTimerTask(Water_Off,6000);//выключение воды через 6 сек
+		_power_level =147;// 0% Е„Е€Е•Д‘Е€Г®ГўГ®Дє Г§Г­Е•Г·ДєГ­ДЌДє ГіД‘Г®ГўГ­Л™ Д›Г®ЕЇГ­Г®Е„Е€ДЌ(147)
+		SetTimerTask(Water_Off,6000);//ГўЕ±Д™Г«ЕЈГ·ДєГ­ДЌДє ГўГ®Г¤Е± Г·ДєД‘ДєГ§ 6 Е„ДєД™
 	}	
 	if ((signal_flag == 1)||(signal_flag == 2))
 	{
-		I2C_SendByteByADDR(Red_warn,pcf8574_addr);//индикация  аварийного события
+		I2C_SendByteByADDR(Red_warn,pcf8574_addr);//ДЌГ­Г¤ДЌД™Е•Г¶ДЌЛ™  Е•ГўЕ•Д‘ДЌГ©Г­Г®ДѓГ® Е„Г®ГЎЕ±Е€ДЌЛ™
 	}	                                                                        
   	SetTimerTask(Read_signal_codes,250); 	   	  	  
  }	
