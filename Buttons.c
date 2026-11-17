@@ -9,116 +9,47 @@
 uint8_t key_state;// граф автомата
 uint8_t btn_pause_state;//
 uint8_t counter_lable;//
-void button_pause_time_counter()
-{
-	switch(counter_lable)
-	{
-		case 1:btn_pause_state = 1;//подавление дребезга
-		break;
-		case 2:btn_pause_state = 2;//кнопека нажата
-		break;
-		case 3:btn_pause_state = 3;//кнопка удерживается
-		break;
-		case 4:btn_pause_state = 4;//автоповтор
-		break;
-	}
-	
-}
+
 void Scan_keys()
 {
 	
 	Read_pcf8475();
+	Read_pcf8475();
 	
-	if (pcf_result & (_BV(4)))key_code = 158;//P4 button1 158
+	if (pcf_result & (_BV(4))) key_code = 158;//P4 button3 158
 	
-	if (pcf_result & (_BV(5))) key_code = 174;//P4 button1 174
+	if (pcf_result & (_BV(5))) key_code = 175;//P5 button2 175
 	
-	if (pcf_result & (_BV(6))) key_code = 206;//P4 button1 206
+	if (pcf_result & (_BV(6))) key_code = 207;//P6 button1 207
+	
+	if (pcf_result & (_BV(LevelPin))) {key_code = 208;signal_code = 1;}//P7 датчик уровня в кубе 207
+	
+ 	//if (pcf_result & ((_BV(6)))&&(_BV(4))) key_code = 223;//button1 + button3 223
+ 	
+ 	//if (pcf_result & ((_BV(6)))&&(_BV(5))) key_code = 239;//button1 + button2 239
+ 	
+ 	//if (pcf_result & ((_BV(4)))&&(_BV(5))) key_code = 191;//button2 + button3 191
+     
+	if (!(pcf_result & (_BV(ErrorPin1)))) {key_code = 15;signal_code = 2;}//P1 датчик наличия жидкости 1 key_code = 15
+	
+	if (!(pcf_result & (_BV(ErrorPin2)))) {key_code = 14;signal_code = 3;}//P0 датчик наличия жидкости 2 key_code = 14
+	
+}
 
-}
-void kbd_drv()
-{
-	Scan_keys();
-	
-	switch (key_state)
-	{
-		case 0:
-		if (key_code>0)
-		{
-			_key_code = key_code;
-			counter_lable=1;
-			SetTimerTask(button_pause_time_counter,DEBOUNCE_DELAY);
-			//btn_pause_state = 1;
-			key_state = 1;
-		}break;
-		case 1:
-		if(btn_pause_state ==1)
-		key_state =	2;
-		break;
-		case 2:
-		if (key_code == _key_code)
-		{
-			counter_lable=2;
-			SetTimerTask(button_pause_time_counter,HOLD_DELAY);
-			buttonstatus=1;// кнопка нажата
-			//key_state = 3;
-		}
-		else
-		{
-			key_state = 0;
-			buttonstatus=4;// кнопка отпущена
-		}break;
- 		case 3:
- 		if (key_code == _key_code)
- 		{
- 			if(btn_pause_state == 2)
- 			{
- 				counter_lable =3;
- 				SetTimerTask(button_pause_time_counter,REPEAT_DELAY);
- 				buttonstatus = 2;// кнопка удерживается
- 				key_state =4;
- 			}
- 			else
- 			{
- 				key_state = 0;
- 			}
- 		}break;
- 		case 4:
- 		if(key_code == _key_code)
- 		{
- 			if(btn_pause_state == 3)
- 			{
- 				buttonstatus = 3;// автоповтор
- 				counter_lable=4;
- 				SetTimerTask(button_pause_time_counter,REPEAT_DELAY);
- 			}
- 			else key_state = 0;
- 		}
- 		
- 		
- 		break;
-	}
-	
-}
 
 void Read_on_off_btn()
 {
-	
-	{
 	if (!(PINB & _BV(On_OffPin)))
-		{
-			if(butcount<3) {butcount++; PORTB |= _BV(OnPin);}
-			else {PORTD |=_BV(ZummerPin); PORTB &=~ _BV(OnPin); }//Çâóêîâàÿ èíäèêàöèÿ ïðè âûêëþ÷åíèè
-		}
-
- 	}
+	{
+		if(butcount<5) {butcount++; PORTB |= _BV(OnPin);}
+		else {PORTD |=_BV(ZummerPin); PORTB &=~ _BV(OnPin); }//Звуковая индикация при выключении
+	}														 //Отключение питания
 	SetTimerTask(Read_on_off_btn,300);
 }
 void Read_keys()
 {
-	 kbd_drv();
+	Scan_keys();
 	
-	if (buttonstatus == 1)
 	{
 		switch (key_code)
 		{
@@ -127,26 +58,42 @@ void Read_keys()
 			{
 	           Zummer_on();
 			   setled();
-			   ptemp = pcf_result;	
+			  // PORTD |= _BV(Valve1_pin);
 			   key_code = 0;
 			}break;
-			case 174:
+			case 175:
 			{
 				Zummer_on();
 				off_led();
-				ptemp = pcf_result;	
+				//PORTD &=~ _BV(Valve1_pin);
+				//PORTD &=~ _BV(Valve2_pin);	
 				key_code = 0;
 			}break;
-			case 206:
+			case 207:
 			{
 				Zummer_on();
-				ptemp = pcf_result;	
+				//PORTD |= _BV(Valve2_pin);	
 				key_code = 0;
 			}break;
+		    case 15:
+			{
+				Zummer_on();
+				key_code = 0;
+			}break;
+			case 14:
+			{
+				Zummer_on();
+				key_code = 0;
+			}break;
+			case 208:
+			{
+				Zummer_on();
+				key_code = 0;
+			}
 		}		
  	}	
-	
-	SetTimerTask(Read_keys,300);
+
+	SetTimerTask(Read_keys,1000);
 }
 void Zummer_off()
 {
@@ -156,4 +103,9 @@ void Zummer_on()
 {
 	PORTD |=_BV(ZummerPin);//
 	SetTimerTask(Zummer_off,150);
+}
+void Zummer_long_on()
+{
+	PORTD |=_BV(ZummerPin);//
+	SetTimerTask(Zummer_off,550);
 }
