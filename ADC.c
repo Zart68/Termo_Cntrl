@@ -170,53 +170,49 @@ void Read_pressure()
 	adc_res = ads1115_readADC_SingleEnded(ADS1115_ADDR_GND,0,ADS1115_DR_8SPS,ADS1115_PGA_4_096);
 	//adc_res = Read_MCP3208(7);
 	adc_value = adc_res	>> 8;//читаем только старший байт
-	ptemp = adc_value ;
+	//ptemp = adc_value ;
 
- 	switch(adc_value)
- 	{
-// 		case 4: ptemp = 0; break;//атмосферное давление
-// 		case 6: ptemp = 1;break;
-// 		case 8: ptemp = 2;break;
-// 		case 10:ptemp = 3;break;
-// 		case 12:ptemp = 4;break;
-// 		case 14:ptemp = 5;break;
-// 		case 16:ptemp = 6;break;
-// 		case 18:ptemp = 7;break;
-// 		case 20:ptemp = 8;break;
-// 		case 22:ptemp = 9;break;
-// 		case 24:ptemp = 10;break;
-// 		case 26:ptemp = 11;break;
-// 		case 28:ptemp = 12;break;
-// 		case 30:ptemp = 13;break;
-// 		case 32:ptemp = 14;break;
-// 		case 34:ptemp = 15;break;
-// 		case 36:ptemp = 16;break;
-// 		case 38:ptemp = 17;break;
-// 		case 40:ptemp = 18;break;
-// 		case 42:ptemp = 19;break;
-// 		case 44:ptemp = 20;break;
-// 		case 46:ptemp = 21;break;
-// 		case 48:ptemp = 22;break;
-// 		case 50:ptemp = 23;break;
-// 		case 52:ptemp = 24;break;
-// 		case 54:ptemp = 25;break;
-// 		case 56:ptemp = 26;break;
-// 		case 58:ptemp = 27;break;
-// 		case 60:ptemp = 28;break;
-// 		case 62:ptemp = 29;break;
-// 		case 64:ptemp = 30;break;
-// 		case 66:ptemp = 31;break;
-// 		case 68:ptemp = 32;break;
-// 		case 70:ptemp = 33;break;
-// 		case 72:ptemp = 34;break;
-// 		case 74:ptemp = 35;break;
-// 		case 76:ptemp = 36;break;
-// 		case 78:ptemp = 37;break;
-// 		case 80:ptemp = 38;break;//38 mmHg
-// 	
- 	}
+ 	
+	if((adc_value>=4)&&(adc_value<6)) ptemp = 0;//атмосферное давление
+ 	else if((adc_value>=6)&&(adc_value<8)) ptemp = 1;
+ 	else if((adc_value>=8)&&(adc_value<10)) ptemp = 2;
+ 	else if((adc_value>=10)&&(adc_value<12)) ptemp = 3;
+ 	else if((adc_value>=12)&&(adc_value<14)) ptemp = 4;
+ 	else if((adc_value>=14)&&(adc_value<16)) ptemp = 6;
+ 	else if((adc_value>=16)&&(adc_value<18)) ptemp = 7;
+ 	else if((adc_value>=18)&&(adc_value<20)) ptemp = 8;
+ 	else if((adc_value>=20)&&(adc_value<22)) ptemp = 9;
+ 	else if((adc_value>=22)&&(adc_value<24)) ptemp = 10;
+ 	else if((adc_value>=24)&&(adc_value<26)) ptemp = 11;
+ 	else if((adc_value>=28)&&(adc_value<30)) ptemp = 12;
+	else if((adc_value>=30)&&(adc_value<32)) ptemp = 13;
+	else if((adc_value>=32)&&(adc_value<34)) ptemp = 14;
+	else if((adc_value>=34)&&(adc_value<36)) ptemp = 15;
+	else if((adc_value>=36)&&(adc_value<38)) ptemp = 16;
+	else if((adc_value>=38)&&(adc_value<40)) ptemp = 17;
+	else if((adc_value>=40)&&(adc_value<42)) ptemp = 18;
+	else if((adc_value>=42)&&(adc_value<44)) ptemp = 19; 
+	else if((adc_value>=44)&&(adc_value<46)) ptemp = 20;
+	else if((adc_value>=46)&&(adc_value<48)) ptemp = 21;
+	else if((adc_value>=48)&&(adc_value<50)) ptemp = 22;
+	else if((adc_value>=50)&&(adc_value<52)) ptemp = 23;
+	else if((adc_value>=52)&&(adc_value<54)) ptemp = 24;
+	else if((adc_value>=54)&&(adc_value<56)) ptemp = 25;
+	else if((adc_value>=56)&&(adc_value<58)) ptemp = 26;
+	else if((adc_value>=58)&&(adc_value<60)) ptemp = 27;
+	else if((adc_value>=60)&&(adc_value<62)) ptemp = 28;
+	else if((adc_value>=62)&&(adc_value<64)) ptemp = 29;
+	else if((adc_value>=64)&&(adc_value<66)) ptemp = 30;
+	else if((adc_value>=68)&&(adc_value<70)) ptemp = 31;
+	else if((adc_value>=70)&&(adc_value<72)) ptemp = 32;
+	else if((adc_value>=72)&&(adc_value<74)) ptemp = 33;
+	else if((adc_value>=74)&&(adc_value<76)) ptemp = 34;
+	else if((adc_value>=76)&&(adc_value<78)) ptemp = 35;
+	else if((adc_value>=78)&&(adc_value<80)) ptemp = 36;
+	else if((adc_value>=80)&&(adc_value<82)) ptemp = 37;
+	else if((adc_value>=80)&&(adc_value<84)) ptemp = 38;//38 mmHg
 	
-	SetTimerTask(Read_pressure,150);
+	SetTimerTask(Read_pressure,500);
 }
 void Read_temp()
 {
@@ -235,32 +231,41 @@ void Water_Off()
 {
 	PORTD &=~_BV(WaterPin);water=0;//выключение вода
 }
-void Read_signal_codes()// ×ňĺíčĺ ęîäîâ ŕâŕđčé
-{		
-	if(!(PINB & _BV(ErrorPin))) //âűńîęčé óđîâĺíü â ¸ěęîńňč
+void Read_signal_codes()// Чтение кодов аварий
+{	
+	if(signal_code==2) //высокий уровень в ёмкости 1
 	{
 		signal_flag = 1;
 		PORTB |=_BV(ZummerPin);
 	}
 	else 	
 	{
-		signal_flag = 0;//îňěĺíŕ
+		signal_flag = 0;//отмена
 		//PORTB &=~ _BV(ZummerPin);
 	}
-    if(!(PIND & _BV(LevelPin))) //íčçęčé óđîâĺíü â 1 ęîíňóđĺ
+	if(signal_code==3) //высокий уровень в ёмкости 1
+	{
+		signal_flag = 3;
+		PORTB |=_BV(ZummerPin);
+	}
+	else
+	{
+		signal_flag = 0;//отмена
+		//PORTB &=~ _BV(ZummerPin);
+	}
+    if(signal_code==1) //низкий уровень в 1 контуре/*!(PIND & _BV(LevelPin))*/
 	{   
 		signal_flag = 2;
-		_power_level =147;// 0% ńňŕđňîâîĺ çíŕ÷ĺíčĺ óđîâí˙ ěîůíîńňč(147)
-		SetTimerTask(Water_Off,6000);//âűęëţ÷ĺíčĺ âîäű ÷ĺđĺç 6 ńĺę
-	}	
-	if ((signal_flag == 1)||(signal_flag == 2))
-	{
-		I2C_SendByteByADDR(Red_warn,pcf8574_addr);//číäčęŕöč˙  ŕâŕđčéíîăî ńîáűňč˙
-	}	                                                                        
-  	SetTimerTask(Read_signal_codes,250); 	   	  	  
- }	
-
-
+		_power_level =120;// 0% стартовое значение уровня мощности(147)
+		SetTimerTask(Water_Off,6000);//выключение воды через 6 сек
+	}
+		
+	//if ((signal_flag == 1)||(signal_flag == 2))
+	//{
+		//I2C_SendByteByADDR(Red_warn,ads1115_addr);//индикация  аварийного события
+	//}	                                                                        
+  	SetTimerTask(Read_signal_codes,250); 	
+}
 
 
 
