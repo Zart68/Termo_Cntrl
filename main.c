@@ -8,16 +8,16 @@
 
 #include "main.h"
 
-uint8_t EEMEM   e_t1_max ;//ïðåäåë òåìïåðàòóðû 1 â eeprom
-uint8_t EEMEM   e_t2_max ;//ïðåäåë òåìïåðàòóðû 2 â eeprom
-uint8_t EEMEM   e_t1_time ;//óñò-êà âðåìåí òåìï. ïàóçû 1 â eeprom
-uint8_t EEMEM   e_t2_time ;//óñò-êà âðåìåí òåìï. ïàóçû 2 â eeprom
-uint8_t EEMEM   e_t1_pause ;//óñò-êà òåìï. ïàóçû 1 â eeprom
-uint8_t EEMEM   e_t2_pause ;//óñò-êà òåìï. ïàóçû 2 â eeprom
+uint8_t EEMEM   e_t1_max ;//предел температуры 1 в eeprom
+uint8_t EEMEM   e_t2_max  //предел температуры 2 в eeprom
+uint8_t EEMEM   e_t1_time ;//уст-ка времен темп. паузы 1 в eeprom
+uint8_t EEMEM   e_t2_time ;//уст-ка времен темп. паузы 2 в eeprom
+uint8_t EEMEM   e_t1_pause ;//уст-ка темп. паузы 1 в eeprom
+uint8_t EEMEM   e_t2_pause ;//уст-ка темп. паузы 2 в eeprom
 
-/**äëÿ äåëåíèÿ, ÷òîáû äîñòè÷ü 50 ìñ, ïîòîìó ÷òî òàéìåð ïåðåïîëíÿåòñÿ êàæäóþ 1 ìñ*/
+/**для деления, чтобы достичь 50 мс, потому что таймер переполняется каждую 1 мс*/
 static uint16_t divider = DIVIDER_RELOAD;
-/**Äîïîëíèòåëüíîå çíà÷åíèå äëÿ ðåãèñòðà ñðàâíåíèÿ */
+/**Дополнительное значение для регистра сравнения */
 //#define COMPADD             225
 uint8_t counter = 0;//
 
@@ -30,23 +30,23 @@ uint8_t counter = 0;//
  }
 
 
-ISR(INT0_vect)//ìîìåíò ïðîõîæäåíèÿ ÷åðåç 0
+ISR(INT0_vect)//момент прохождения через 0
 { 	
-	TCNT2 =_power_level; //	ïðèñâàåâàåì ðåãèñòðó çíà÷åíèå ìîùíîñòè 120 min, 0xFF max	
-	TCCR2B |= _BV(CS20)|_BV(CS22)|_BV(CS21); //çàïóñêàåì òàéìåð2 (in Normal Mode)/1024	
+	TCNT2 =_power_level; //	присваеваем регистру значение мощности 120 min, 0xFF max		
+	TCCR2B |= _BV(CS20)|_BV(CS22)|_BV(CS21); //запускаем таймер2 (in Normal Mode)/1024	
 	
 }
 //----------------------------------------
-ISR(TIMER2_OVF_vect)//ïðåðûâàíèå ïî ïåðåïîëíåíèþ çà 0,016 ñåê
+ISR(TIMER2_OVF_vect)//прерывание по переполнению за 0,016 сек
 {
 	if(divider>0)
 	--divider;// /2
-	else //0,032 ñåê
+	else //0,032 сек
 	{
-		PORTC |=_BV(ScrPort);//îòêðûâàþùèé èìïóëüñ
+		PORTC |=_BV(ScrPort);//открывающий импульс
 		_delay_us(t_pulse_triac);	
 		PORTC &=~ _BV(ScrPort);//
-		TCCR2B &=~ _BV(CS20)|_BV(CS22)|_BV(CS21);//îñòàíîâêà òàéìåðà
+		TCCR2B &=~ _BV(CS20)|_BV(CS22)|_BV(CS21);//остановка таймера
 	}
 	
 }
@@ -62,30 +62,30 @@ void Main_task()
 // 		power_level=0;
 // 	}
 	//case 5:   _power_level = power_level; break;
-	case 8:   PORTC &=~_BV(MixPin);mixer=0; break;//âûêëþ÷åíèå ìèêñåð
-	case 81:  PORTC |= _BV(MixPin);mixer=1; break;//âêëþ÷åíèå ìèêñåð
-	case 7:   {PORTC &=~_BV(PumpPin);pump=0; }break;//âûêëþ÷åíèå íàñîñ
-	case 71:  {PORTC |= _BV(PumpPin);pump=1;} break;//âêëþ÷åíèå íàñîñ
-	case 9:   {PORTD |= _BV(WaterPin);water=1;}break;//âêëþ÷åíèå âîäà
-	case 91:  {PORTD &=~_BV(WaterPin);water=0;}break;//âûêëþ÷åíèå âîäà
-	case 72:  {PORTD |=_BV(CoolerPin);cooler=1;}break;//âêëþ÷åíèå êóëåð ìèêñåðà
-	case 73:  {PORTD &=~_BV(CoolerPin);cooler=0;}break;//âûêëþ÷åíèå êóëåð ìèêñåðà
-	case 3:   mode = 3;break;//íàãðåâ
-	case 1:   mode = 1;break;//äèñòèëëÿöèÿ
+	case 8:   PORTC &=~_BV(MixPin);mixer=0; break;//выключение миксер
+	case 81:  PORTC |= _BV(MixPin);mixer=1; break;//включение миксер
+	case 7:   {PORTC &=~_BV(PumpPin);pump=0; }break;//выключение насос
+	case 71:  {PORTC |= _BV(PumpPin);pump=1;} break;//включение насос
+	case 9:   {PORTD |= _BV(WaterPin);water=1;}break;//включение вода
+	case 91:  {PORTD &=~_BV(WaterPin);water=0;}break;//выключение вода
+	case 72:  {PORTD |=_BV(CoolerPin);cooler=1;}break;//включение кулер миксера
+	case 73:  {PORTD &=~_BV(CoolerPin);cooler=0;}break;//выключение кулер миксера
+	case 3:   mode = 3;break;//нагрев
+	case 1:   mode = 1;break;//дистилляция
 	//case 6:   {}break;//ñîåäèíåíèå ðàçîðâàíî
-	//case 11:  PORTC |= _BV(Valve_pin); break;//êëàïàí âêëþ÷åí	
-	//case 12:  PORTC &=~ _BV(Valve_pin); break;//êëàïàí îòêëþ÷åí	
-	case 13:  timer1_start();break;//ïåðåñòàëüòè÷åñêèé íàñîñ âêëþ÷åí
-	case 14:  timer1_stop();  break;//ïåðåñòàëüòè÷åñêèé íàñîñ îòêëþ÷åí
-	case 15:  {PORTB |=_BV(PrstPumpStp);DDRB |=_BV(PrstPumpStp);} break;//ïåðåñòàëüòè÷åñêèé íàñîñ ïàóçà
-	case 16:  {PORTB &=~ _BV(PrstPumpStp);DDRB &=~ _BV(PrstPumpStp);} break;//ïåðåñòàëüòè÷åñêèé íàñîñ îòìåíà ïàóçû 
+	case 11:  PORTD |= _BV(Valve1_pin);break; //клапан включен	
+	case 12:  PORTD &=~ _BV(Valve1_pin);break; //клапан отключен	
+	case 13:  timer1_start();break;//перестальтический насос включен
+	case 14:  timer1_stop();  break;//перестальтический насос отключен
+	case 15:  {PORTB |=_BV(PrstPumpStp);DDRB |=_BV(PrstPumpStp);} break;//перестальтический насос пауза
+	case 16:  {PORTB &=~ _BV(PrstPumpStp);DDRB &=~ _BV(PrstPumpStp);} break;//перестальтический насос отмена паузы 
 	case 17:  {
 				timer1_start();
 				if (prst_work < 990)
 				{
-					prst_work = prst_work + 10 ;//èçìåíåíèå ñêâàæíîñòè ïåðåñòàëüòèêè
+					prst_work = prst_work + 10 ;//изменение скважности перестальтики
 					prst_pause = period - prst_work;
-					prst_spd_value = prst_work/10;//çíà÷åíèå â ïðîöåíòàõ
+					prst_spd_value = prst_work/10;//значение в процентах
 					rx_flag = 0;
 				}
 				
@@ -93,9 +93,9 @@ void Main_task()
 	case 18:  {
 		       if(prst_work >10)
 			   {
-				   prst_work = prst_work - 10 ;//èçìåíåíèå ñêâàæíîñòè ïåðåñòàëüòèêè
+				   prst_work = prst_work - 10 ;//изменение скважности перестальтики
 		           prst_pause = period - prst_work;
-		           prst_spd_value = prst_work/10;//çíà÷åíèå â ïðîöåíòàõ
+		           prst_spd_value = prst_work/10;//значение в процентах
 				   rx_flag = 0;
 				}
 				else
@@ -104,14 +104,14 @@ void Main_task()
 				}
 	          }break;	
 	case 19:	{
-		            _prst_work = prst_work;//ñîõðàíÿåì ïðåäûäóùåå çíà÷åíèå
+		            _prst_work = prst_work;//сохраняем предыдущее значение
 					prst_work = 999;//ðàçãîí
 					prst_pause = period - prst_work;
-					prst_spd_value = 100;//çíà÷åíèå â ïðîöåíòàõ
+					prst_spd_value = 100;//значение в процентах
 					rx_flag = 0;
 				}break;	
 	case 20:	{
-		            prst_work = _prst_work;//âîçâðàùàåì ïðåäûäóùåå çíà÷åíèå
+		            prst_work = _prst_work;//возвращаем предыдущее значение
 					prst_pause = period - prst_work;
 					prst_spd_value = prst_work/10;//çíà÷åíèå â ïðîöåíòàõ
 					_prst_work = 0;
